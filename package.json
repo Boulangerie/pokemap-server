@@ -1,0 +1,22 @@
+{
+  "name": "pokemap-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Boulangerie/pokemap-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Boulangerie/pokemap-server/issues"
+  },
+  "homepage": "https://github.com/Boulangerie/pokemap-server#readme",
+  "dependencies": {
+    "pokemon-go-node-api": "^1.2.2"
+  }
+}
