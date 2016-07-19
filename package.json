@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Boulangerie/pokemap-server#readme",
   "dependencies": {
+    "express": "^4.14.0",
     "pokemon-go-node-api": "^1.2.2"
   }
 }
