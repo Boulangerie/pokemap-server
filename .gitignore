@@ -1,8 +1,10 @@
+
 # compiled output
 /dist
 /tmp
 
 # dependencies
+/python_vendors
 /node_modules
 /bower_components
 
