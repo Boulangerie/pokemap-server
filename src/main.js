@@ -4,9 +4,17 @@ var User = require('./User.class.js');
 console.log(User)
 
 var app = express();
-app.set('json spaces', 2)
 var user = new User(config);
 var loginPromise;
+
+app.set('json spaces', 2)
+
+app.use(function (req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  next();
+});
 
 app.listen(3000, function () {
   console.log('listening on port 3000!');
