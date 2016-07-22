@@ -4,8 +4,9 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "install": "./install.sh",
-    "start": "node src/main.js"
+    "preinstall": "npm run install-node-gyp && node-gyp-install",
+    "start": "node src/main.js",
+    "install-node-gyp": "npm list node-gyp-install -g || npm install node-gyp-install -g"
   },
   "repository": {
     "type": "git",
