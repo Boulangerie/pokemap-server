@@ -4,6 +4,7 @@ var User = require('./User.class.js');
 console.log(User)
 
 var app = express();
+app.set('json spaces', 2)
 var user = new User(config);
 var loginPromise;
 
