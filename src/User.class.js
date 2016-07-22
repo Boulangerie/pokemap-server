@@ -1,6 +1,6 @@
 var Promise = require('es6-promise').Promise;
 var uuid = require('uuid');
-var PokemonGO = require('./node_modules/pokemon-go-node-api/poke.io.js');
+var PokemonGO = require('../node_modules/pokemon-go-node-api/poke.io.js');
 
 function User(config) {
   this.uuid = uuid.v4();
