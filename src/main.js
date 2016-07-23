@@ -1,39 +1,58 @@
-var express = require('express');
-var config = require('./config.json');
-var User = require('./User.class.js');
-console.log(User)
+const express  = require('express')
+const bodyParser = require('body-parser')
 
-var app = express();
-var user = new User(config);
-var loginPromise;
+const User = require('./User.class.js')
+
+const app = express()
 
 app.set('json spaces', 2)
 
-app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-  next();
-});
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-app.listen(3000, function () {
-  console.log('listening on port 3000!');
-  loginPromise = user.login();
-});
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
+  next()
+})
 
-app.get('/getHeartbeat/:coords', function (request, response) {
-  var latitude = parseFloat(request.params.coords.split(',')[0], 10);
-  var longitude = parseFloat(request.params.coords.split(',')[1], 10);
+app.listen(3000, () => {
+  console.log('listening on port 3000!')
+})
+
+let errorIt = (res, err) => res.json({error: err})
+
+app.get('/', (req, res) => {
+  let routes = app._router.stack
+    .filter(val => val.route)
+    .map(val => `${val.route.stack[0].method.toUpperCase()} ${val.route.path}`)
+
+  res.json(200, routes)
+})
+
+app.post('/login', (req, res) => {
+  let method = req.body.method
+  var config = require('./config.json')
+  var user = new User(config)
+  user.login().then(() => {
+    res.json({'status': 'valid'})
+  })
+})
+
+app.get('/getHeartbeat/:coords', (req, res) => {
+  var latitude = parseFloat(req.params.coords.split(',')[0], 10)
+  var longitude = parseFloat(req.params.coords.split(',')[1], 10)
   user
     .setLocation(latitude, longitude)
     .then(function(location) {
-      console.log(user.uuid, location);
-      return user.getHeartbeat();
+      console.log(user.uuid, location)
+      return user.getHeartbeat()
     })
-    .then(function(res) {
-      response.json(res);
+    .then(function(heartbeat) {
+      res.json(heartbeat)
     })
     .catch(function(err) {
-      response.json({'error': err});
-    });
-});
+      errorIt(res, err)
+    })
+})

@@ -4,8 +4,10 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "install": "./install.sh",
-    "start": "node src/main.js"
+    "preinstall": "npm run install-node-gyp && node-gyp-install",
+    "dev": "nodemon src/main.js",
+    "start": "node src/main.js",
+    "install-node-gyp": "npm list node-gyp-install -g || npm install node-gyp-install -g"
   },
   "repository": {
     "type": "git",
@@ -18,9 +20,13 @@
   },
   "homepage": "https://github.com/Boulangerie/pokemap-server#readme",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "es6-promise": "^3.2.1",
     "express": "^4.14.0",
     "pokemon-go-node-api": "latest",
     "uuid": "^2.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.9.2"
   }
 }
