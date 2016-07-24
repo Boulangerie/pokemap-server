@@ -1,68 +1,87 @@
-var Promise = require('es6-promise').Promise;
-var uuid = require('uuid');
-var PokemonGO = require('../node_modules/pokemon-go-node-api/poke.io.js');
+var Promise = require('es6-promise').Promise
+var UUID = require('uuid')
+var PokemonGO = require('../node_modules/pokemon-go-node-api/poke.io.js')
 
-function User(config) {
-  this.uuid = uuid.v4();
-  this.pokeUser = new PokemonGO.Pokeio();
-  this.pokeUser.playerInfo.provider = config.provider;
-  this.username = config.username;
-  this.password = config.password;
-};
+var userList = []
 
-User.prototype.login = function login() {
-  var user = this.pokeUser;
-  var promise = new Promise(function (resolve, reject) {
-    user.GetAccessToken(this.username, this.password, function(err) {
-      if (err) {
-        reject(err);
-      }
-      user.GetApiEndpoint(function(err) {
-        if (err) {
-          reject(err);
-        }
-        resolve(this);
-      });
-    });
-  }.bind(this));
-  return promise;
-};
+class User {
+  static get list () {
+    return userList;
+  }
+  static addUser () {
+    let user = new User()
+    User.list.push(user)
+    return user
+  }
 
-User.prototype.setLocation = function setLocation(latitude, longitude) {
-  var user = this.pokeUser;
-  var promise = new Promise(function (resolve, reject) {
-    if (isNaN(latitude) || isNaN(longitude)) {
-      reject('latitude or longitude is Invalid');
+  constructor (uuid = UUID.v4()) {
+    this.uuid = uuid
+    this.pokeUser = new PokemonGO.Pokeio()
+  }
+
+  set provider (provider) {
+    this.pokeUser.playerInfo.provider = provider
+  }
+  get provider () {
+    return this.pokeUser.playerInfo.provider
+  }
+
+  login (provider = this.provider, username = this.username, password = this.password) {
+    this.provider = provider
+    this.username = username
+    this.password = password
+
+    if (this.pokeUser.playerInfo.accessToken) {
+      return Promise.resolve(this)
     }
-    var location = {
-      'type': 'coords',
-      'coords': {
-        'latitude': latitude,
-        'longitude': longitude,
-        'altitude': 0
-      }
-    };
-    user.SetLocation(location, function(err) {
-      if (err) {
-        reject(err);
-      }
-      resolve(location.coords)
-    });
-  });
-  return promise;
-};
 
-User.prototype.getHeartbeat = function getHeartbeat() {
-  var user = this.pokeUser;
-  var promise = new Promise(function (resolve, reject) {
-    user.Heartbeat(function(err, hr) {
-      if (err) {
-        reject(err);
-      }
-      resolve(hr)
-    });
-  });
-  return promise;
-};
+    return new Promise((resolve, reject) => {
+      this.pokeUser.GetAccessToken(this.username, this.password, (err) => {
+        err && reject(err)
+        this.pokeUser.GetApiEndpoint((err) => {
+          err && reject(err)
+          this.pokeUser.GetProfile((err, profile) => {
+            this.pokeUser._profile = profile
+            resolve(this)
+          })
+        })
+      })
+    })
+  }
 
-module.exports = User;
+  setLocation (lat, lon) {
+    return new Promise((res, reject) => {
+      if (isNaN(lat) || isNaN(lon)) {
+        reject('Latitude or longitude are invalid')
+      }
+      let location = {
+        'type': 'coords',
+        'coords': {
+          'latitude': lat,
+          'longitude': lon,
+          'altitude': 0
+        }
+      }
+      this.pokeUser.SetLocation(location, (err) => {
+        err && reject(err)
+        res(location.coords)
+      })
+    })
+  }
+
+  getHeartbeat () {
+    return new Promise((resolve, reject) => {
+      this.pokeUser.Heartbeat((err, hr) => {
+        err && reject(err)
+        resolve(hr)
+      })
+    })
+  }
+}
+
+User.PROVIDER = {
+  GOOGLE: 'google',
+  PTC: 'ptc'
+}
+
+module.exports = User
