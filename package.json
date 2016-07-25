@@ -2,11 +2,11 @@
   "name": "pokemap-server",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
     "preinstall": "npm run install-node-gyp && node-gyp-install",
     "dev": "nodemon src/main.js",
-    "start": "node src/main.js",
+    "start": "babel-node src/main.js",
     "install-node-gyp": "npm list node-gyp-install -g || npm install node-gyp-install -g"
   },
   "repository": {
@@ -27,6 +27,7 @@
     "uuid": "^2.0.2"
   },
   "devDependencies": {
+    "babel-cli": "^6.11.4",
     "nodemon": "^1.9.2"
   }
 }
